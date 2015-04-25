@@ -1,0 +1,21 @@
+# --------------------
+# Node Files
+# --------------------
+.nodemonignore
+npm-debug.log
+node_modules/
+
+
+# --------------------
+# Bower Files
+# --------------------
+.bower-*/
+bower_components
+
+# --------------------
+# Generated Files
+# --------------------
+public/assets/libs
+public/assets/css
+public/assets/js
+
