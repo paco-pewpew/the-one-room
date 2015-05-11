@@ -1,45 +1,56 @@
-(function(){
-	'use strict';
-	var Message=require('./message.model.js');
-	var users=[];
-	
-	module.exports=function(io){
+'use strict';
 
-	io.on('connection',function(socket){
-			var nameOnSocket;
+const USERS = new Set();
 
-			socket.on('get name',function(msg){
-				if(users.indexOf(msg.name)>=0){
-					io.to(socket.id).emit('set name',{free:'no'});	
-				}else{
-					socket.join('The One Room');
-					nameOnSocket=msg.name;
-					users.push(nameOnSocket);
-					io.to(socket.id).emit('set name',{free:'yes',user:nameOnSocket,current:users});
-					io.to('The One Room').emit('user joined',{user:nameOnSocket,current:users});
-				}
-			});
+function chatLogic(io) {
 
-			socket.on('chat message',function(msg){
-					if(msg){
-						var fullMessage={sender:nameOnSocket,message:msg,time:Date.now()};
-						Message.create(fullMessage,function(err){
-							if(err)
-								console.log(err);
-						});
-						io.to('The One Room').emit('chat message',fullMessage);
-					}
-			});
+	io.on('connection', (socket) => {
+		let NAME;
 
-			socket.on('disconnect',function(){
-				//remove name from user lists so it can be used again
-				users.splice(users.indexOf(nameOnSocket),1);
-				if(nameOnSocket){
-					io.to('The One Room').emit('user left',{user:nameOnSocket,current:users});
-				}
-			});
-			
+		socket.on('get name', (msg) => {
+			if (USERS.has(msg.name)) {
+				io.to(socket.id).emit('set name', { free: 'no' });	
+			} else {
+				socket.join('The One Room');
+				NAME = msg.name;
+				USERS.add(NAME);
+				
+				io.to(socket.id).emit('set name', {
+					free: 'yes',
+					user: NAME,
+					current: Array.from(USERS.values())
+				});
+				
+				io.to('The One Room').emit('user joined', {
+					user: NAME,
+					current: Array.from(USERS.values())
+				});
+			}
 		});
 
-	};
-})();
+		socket.on('chat message', (msg) => {
+				if (msg) {
+					io.to('The One Room').emit('chat message', {
+						sender: NAME,
+						message: msg,
+						time: Date.now()
+					});
+				}
+		});
+
+		socket.on('disconnect', () => {
+			if (NAME) {
+				USERS.delete(NAME);
+				
+				io.to('The One Room').emit('user left', {
+					user: NAME,
+					current: Array.from(USERS.values())
+				});
+			}
+		});
+		
+	});
+
+}
+
+export { chatLogic };

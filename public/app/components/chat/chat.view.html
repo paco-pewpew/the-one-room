@@ -1,18 +1,14 @@
 <div id="simpleChatWrapper" >
-
-	<div id="slidingContent" ng-class="{'chat-visible':vm.chatVisible}">
-
-		<div id="enableChatWrapper" ng-click="vm.toggleChat()" ng-swipe-left="vm.toggleChat()" ng-swipe-right="vm.toggleChat()">
-			
-			<i id="chatNotify" class="fa fa-weixin" ng-class="{'attention':vm.unseenMessages>0}"></i>
-
-			<i id="enableChatBtn" class="fa fa-chevron-left"
-			ng-class="{'fa-chevron-right':vm.chatVisible}">
-			</i>
+	<div id="slidingContent" ng-class="{ 'chat-visible': vm.chatVisible }">
+		<div id="enableChatWrapper"
+		ng-click="vm.toggleChat()"
+		ng-swipe-left="vm.toggleChat()"
+		ng-swipe-right="vm.toggleChat()">
+			<i id="chatNotify" class="fa fa-weixin" ng-class="{ 'attention': vm.unseenMessages > 0 }"></i>
+			<i id="enableChatBtn" class="fa fa-chevron-left" ng-class = "{ 'fa-chevron-right': vm.chatVisible }"></i>
 		</div>
-
-		<div  id="simpleChat">
-			<div id="enterForm" ng-hide="vm.username">
+		<div id="simpleChat">
+			<div id="enterForm" ng-if="!vm.username">
 				<h1>The One Room</h1>
 				<p>Please choose a username so you can join the chat</p>
 				<form>
@@ -22,54 +18,14 @@
 				</form>
 				<span ng-show="vm.errors.name">Cannot use that name</span>
 			</div>
-
-			<div id="chatHeader" ng-show="vm.username">
-				<p>Hello, {{vm.username}} !</p>
-				<p>Current users:
-					<i class="fa fa-user sender" ng-repeat="user in vm.currentUsers"
-					ng-class="{'fa-user-times':vm.blockedUsers.indexOf(user)!==-1}"
-					ng-click="vm.toggleBlock(user)"
-					ng-mouseenter="hover=true"
-					ng-mouseleave="hover=false"
-					ng-class="{'fa-user-times':hover}"
-					>
-						{{user}} {{$last?'.':', '}}
-					</i>
-				</p>
+			<div ng-if="vm.username">
+				<users-slider me="vm.username" users="vm.currentUsers" blocked="vm.blockedUsers"></users-slider>
+				<chat-messages me="vm.username" messages="vm.messages" blocked="vm.blockedUsers"></chat-messages>
+				<form id="message">
+					<input ng-model="vm.formMessage">
+					<button ng-click="vm.sendMessage()">send</button>
+				</form>
 			</div>
-
-			<ul id="chatMessages" ng-show="vm.username" scroll-glue>
-				<li ng-repeat="message in vm.messages" ng-show="vm.blockedUsers.indexOf(message.sender)===-1">
-					<i class="fa fa-user sender" 
-					ng-hide="vm.messages[$index-1].sender===message.sender"
-					ng-click="vm.toggleBlock(message.sender)"
-					ng-mouseenter="hover=true"
-					ng-mouseleave="hover=false"
-					ng-class="{'fa-user-times':hover,'my-text':message.sender===vm.username}"
-					>
-						{{message.sender}} :
-					</i>
-					
-					<blockquote class="text-bubble"
-					ng-class="{'my-text':message.sender===vm.username,
-					'first-message':vm.messages[$index-1].sender!==message.sender}">
-						<p>
-							{{message.message}}
-						</p>	
-					</blockquote>
-					
-					<span class="time">
-						{{message.time|date:'mediumTime'}}
-					</span>
-				</li>
-			</ul>
-
-			<form id="message" ng-show="vm.username">
-				<input ng-model="vm.formMessage">
-				<button ng-click="vm.sendMessage()">send</button>
-			</form>
 		</div>
-
 	</div>
-
 </div>

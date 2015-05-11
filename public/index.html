@@ -1,24 +1,29 @@
 <!doctype html>
 <html>
-<head>
-	      <title>The One Room</title>
-        <meta charset="UTF-8">
-        <base href="/"></base>
-        <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
-        <link rel="stylesheet" href="assets/libs/font-awesome/css/font-awesome.min.css">
-        <link rel="stylesheet" href="assets/css/the-one-roomStyle.concat.min.css">
-</head>
-<body>
 
-	<div ng-app="theOneRoom" ng-controller="ChatCtrl as vm" ng-include="'app/components/chat/chat.view.html'"></div>
+  <head>
+    <title>The One Room</title>
+    <meta charset="UTF-8">
+    <base href="/"></base>
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+    <link rel="stylesheet" href="assets/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/the-one-roomStyle.concat.min.css">
+  </head>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="assets/libs/angular/angular.js"></script>
-  <script src="assets/libs/angular-animate/angular-animate.js"></script>
-  <script src="assets/libs/angular-touch/angular-touch.js"></script>
-  <script src="assets/libs/angular-scroll-glue/src/scrollglue.js"></script>
+  <body>
 
-  <script src="assets/js/the-one-roomBuilt.concat.min.js"></script>
+    <div ng-app="theOneRoom" ng-controller="ChatCtrl as vm" ng-include="'app/components/chat/chat.view.html'"></div>
 
-</body>
+    <!-- SPELLS  -->
+    <script src="traceur/bin/traceur-runtime.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="assets/libs/angular/angular.js"></script>
+    <script src="assets/libs/angular-animate/angular-animate.js"></script>
+    <script src="assets/libs/angular-touch/angular-touch.js"></script>
+    <script src="assets/libs/angular-scroll-glue/src/scrollglue.js"></script>
+
+    <!-- Angular custom -->
+    <script src="assets/build/app.transpiled.module.js"></script>
+    
+  </body>
 </html>

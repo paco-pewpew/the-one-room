@@ -1,45 +1,38 @@
-(function() {
-    'use strict';
+'use strict';
+const SOCKETIO = new WeakMap();
+const ROOTSCOPE = new WeakMap();
 
-    angular
-        .module('theOneRoom')
-        .factory('Socketio', socketio);
+class Socketio {
+  constructor($rootScope) {
+    ROOTSCOPE.set(this, $rootScope);
+    SOCKETIO.set(this, io.connect());
+  }
 
-    /* @ngInject */
-    function socketio($rootScope) {
-        var socket=io.connect();
-        var service = {
-            on: on,
-            emit:emit
-        };
-        return service;
-
-        ////////////////
-
-        function on(eventName, callback) {
-        	//remove old listener if needed- no more multiple emits
-            //console.log(Object.keys(socket._callbacks.indexOf(eventName)));
-    		if(socket.hasListeners(eventName)){
-    			socket.removeEventListener(eventName);
-    		}
-    		socket.on(eventName,function(){
-    			var args=arguments;
-    			$rootScope.$apply(function(){
-    				callback.apply(socket,args);
-    			});
-    		});
-	    }
-
-	    function emit(eventName, data, callback) {
-	      socket.emit(eventName, data, function () {
-	        var args = arguments;
-	        $rootScope.$apply(function () {
-	          if (callback) {
-	            callback.apply(socket, args);
-	          }
-	        });
-	      });
-	    }
-
+  on(eventName, callback) {
+    if (SOCKETIO.get(this).hasListeners(eventName)) {
+      SOCKETIO.get(this).removeEventListener(eventName);
     }
-})();
+    SOCKETIO.get(this).on(eventName, (...args) => {
+      ROOTSCOPE.get(this).$apply(() => {
+        callback.apply(SOCKETIO.get(this), args);
+      });
+    });
+  }
+
+  emit(eventName, data, callback) {
+    SOCKETIO.get(this).emit(eventName, data, (...args) => {
+      ROOTSCOPE.get(this).$apply(() => {
+        if (callback) callback.apply(SOCKETIO.get(this), args);
+      });
+    });
+  }
+
+  static factoryFn($rootScope) {
+    return new Socketio($rootScope);
+  }
+}
+
+Socketio.factoryFn.$inject = ['$rootScope'];
+
+export default Socketio.factoryFn;
+

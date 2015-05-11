@@ -1,0 +1,14 @@
+<div id="chatHeader">
+	<p> {{::vm.title}} </p>
+	<p>Current users:
+		<i 
+		ng-repeat="user in vm.users"
+		ng-click="vm.toggleBlock(user)"
+		ng-mouseenter="hover = true"
+		ng-mouseleave="hover = false"
+		class="fa fa-user sender"
+		ng-class="{ 'fa-user-times': hover, 'fa-user-times': vm.blocked.indexOf(user) !== -1 }">
+			{{::user}} {{($last ? ".": ", ")}}
+		</i>
+	</p>
+</div>

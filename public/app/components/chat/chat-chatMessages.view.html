@@ -1,0 +1,26 @@
+<ul id="chatMessages" scroll-glue>
+	<li
+	ng-repeat="message in vm.messages"
+	ng-show="vm.blocked.indexOf(message.sender) === -1">
+		<i 
+		ng-hide="vm.messages[$index-1].sender === message.sender"
+		ng-click="vm.toggleBlock(message.sender)"
+		ng-mouseenter="hover = true"
+		ng-mouseleave="hover = false"
+		class="fa fa-user sender"
+		ng-class="{'fa-user-times': hover, 'my-text': message.sender === vm.me}">
+			{{::message.sender}} :
+		</i>
+		<blockquote
+		class="text-bubble"
+		ng-class="{ 'my-text': message.sender === vm.me,
+		'first-message': vm.messages[$index-1].sender !== message.sender}">
+			<p>
+				{{::message.message}}
+			</p>	
+		</blockquote>
+		<span class="time">
+			{{::message.time | date: 'mediumTime'}}
+		</span>
+	</li>
+</ul>

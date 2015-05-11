@@ -1,3 +1,4 @@
+'use strict';
 module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
@@ -5,126 +6,108 @@ module.exports = function(grunt) {
 		js_dist_path:'public/assets/js',
 		css_dist_path:'public/assets/css',
 		app_build_path:'public/app/',
-        components_build_path:'public/app/components/',
-        shared_build_path:'public/app/shared/',
+		components_build_path:'public/app/components/',
+		shared_build_path:'public/app/shared/',
 		
 
-         ngAnnotate: {
-	        derp: {
-	            files: [
-	                {
-	                    expand: true,
-	                    src: ['<%=app_build_path%>/**/*.js'],
-	                    dest:'<%=js_dist_path%>',
-	                    ext: '.annotated.js', // Dest filepaths will have this extension.
-	                    extDot: 'last',       // Extensions in filenames begin after the last dot
-	                    flatten: true
-	                }
-	            ]
-	        }
-	    },
+	  traceur: {
+      options: {
+        traceurRuntime: 'node_modules/traceur/bin/traceur-runtime.js',
+        traceurCommand: 'node_modules/traceur/src/node/command.js',
+        //includeRuntime: true, will be added to the build file
+        sourceMaps: true,
+        experimental: true,
+
+      },
+      all: {
+        files: {
+          'public/assets/build/app.transpiled.module.js': ['public/app/app.module.js']
+        }
+      }
+    },
+
+	  less: {
+	  	build: {
+	  		files:[{
+	  			expand: true,
+	  			cwd: '<%=app_build_path%>',
+	  			src: ['**/*.less'],
+	  			dest: '<%=css_dist_path%>',
+	  			ext: '.css',
+	  			flatten: true
+	  		}]
+	  	}
+	  },
 
 
-		less: {
-	      build: {
-	        files:[{
-			  expand: true,
-			  cwd: '<%=components_build_path%>',
-			  src: ['**/*.less'],
-			  dest: '<%=css_dist_path%>',
-			  ext: '.css',
-			  flatten: true
-			},{
-			  expand: true,
-			  cwd: '<%=shared_build_path%>',
-			  src: ['**/*.less'],
-			  dest: '<%=css_dist_path%>',
-			  ext: '.css',
-			  flatten: true
-			}]
-	      }
-	    },
-
-
-	    concat:{
-	    	js:{
-	    		files:[{
-				  src: ['<%=js_dist_path%>/*.js','!<%=js_dist_path%>/*.concat.js','!<%=js_dist_path%>/*.concat.min.js'],
-				  dest: '<%=js_dist_path%>/the-one-roomBuilt.concat.js'
+	  concat:{
+			css:{
+				files:[{
+					src:['<%=css_dist_path%>/*.css','!<%=css_dist_path%>/*.concat.css','!<%=css_dist_path%>/*.concat.min.css'],
+					dest:'<%=css_dist_path%>/the-one-roomStyle.concat.css'
 				}]
-	    	},
-	    	css:{
-	    		files:[{
-	    			src:['<%=css_dist_path%>/*.css','!<%=css_dist_path%>/*.concat.css','!<%=css_dist_path%>/*.concat.min.css'],
-	    			dest:'<%=css_dist_path%>/the-one-roomStyle.concat.css'
-	    		}]
-	    	}
-	    },
-
-	     uglify:{
-	    	all:{
-	    		files:[{
-				  expand: true,
-				  cwd: '<%=js_dist_path%>',
-				  src: ['*.concat.js'],
-				  dest: '<%=js_dist_path%>',
-				  ext: '.min.js',
-				  extDot: 'last',
-				  flatten: true
-				}]
-	    	}
-	    },
-
-	    cssmin:{
-	    	all:{
-	    		files:[{
-	    		  expand: true,
-				  cwd: '<%=css_dist_path%>',
-				  src: ['*.concat.css'],
-				  dest: '<%=css_dist_path%>',
-				  ext: '.min.css',
-				  extDot: 'last',
-				  flatten: true
-	    		}]
-	    	}
-	    },
-
-	    watch: {
-	      css: {
-	        files: ['<%=components_build_path%>/**/*.less','<%=shared_build_path%>/**/*.less'],
-	        tasks: ['less','concat:css','cssmin']
-	      },
-	      js:{
-	      	files: ['<%=app_build_path%>/**/*.js'],
-	      	tasks: ['ngAnnotate','concat:js','uglify']
-	      }
-	    },
-
-	    nodemon:{
-			dev:{
-				script:'server.js'
 			}
 		},
 
-	    concurrent: {
-	      options: {
-	        logConcurrentOutput: true
-	      },
-	      tasks: ['nodemon', 'watch']
-	    }  
+		autoprefixer: {
+			dist: {
+				options: {
+					browsers: ['last 2 versions', 'ie 8', 'ie 9']
+				},
+				files: {
+					'<%=css_dist_path%>/the-one-roomStyle.concat.css': '<%=css_dist_path%>/the-one-roomStyle.concat.css'
+				}
+			}
+		},
 
-	});
-	
-	grunt.loadNpmTasks('grunt-ng-annotate');
-	grunt.loadNpmTasks('grunt-contrib-less');
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-cssmin');	
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-ng-annotate');
-	grunt.loadNpmTasks('grunt-nodemon');
-	grunt.loadNpmTasks('grunt-concurrent');
-	
-	grunt.registerTask('default',['less','ngAnnotate','concat','uglify','cssmin','concurrent']);
-	grunt.registerTask('dev',['concurrent']);
+		cssmin:{
+			all:{
+				files:[{
+					expand: true,
+					cwd: '<%=css_dist_path%>',
+					src: ['*.concat.css'],
+					dest: '<%=css_dist_path%>',
+					ext: '.min.css',
+					extDot: 'last',
+					flatten: true
+				}]
+			}
+		},
+
+		watch: {
+			css: {
+				files: ['<%=components_build_path%>/**/*.less','<%=shared_build_path%>/**/*.less'],
+				tasks: ['less','concat:css','autoprefixer','cssmin']
+			},
+			js:{
+				files: ['<%=app_build_path%>/**/*.js'],
+				tasks: ['traceur']
+			}
+		},
+
+		nodemon: {
+			dev: {
+				script: 'init.js'
+			}
+		},
+
+		concurrent: {
+			options: {
+				logConcurrentOutput: true
+			},
+			tasks: ['nodemon', 'watch']
+		}
+
+  });
+
+grunt.loadNpmTasks('grunt-contrib-less');
+grunt.loadNpmTasks('grunt-autoprefixer');
+grunt.loadNpmTasks('grunt-contrib-cssmin');	
+grunt.loadNpmTasks('grunt-contrib-watch');
+grunt.loadNpmTasks('grunt-contrib-concat');
+grunt.loadNpmTasks('grunt-nodemon');
+grunt.loadNpmTasks('grunt-concurrent');
+grunt.loadNpmTasks('grunt-traceur-simple');
+
+grunt.registerTask('default', ['less', 'traceur', 'concat:css', 'autoprefixer', 'cssmin', 'concurrent']);
 };

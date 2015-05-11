@@ -1,8 +1,8 @@
 # The One Room
+written in ES6; Traceur used to transform to ES5
 
 Installation
 --------------
-- If you want to save messages - connect to your DB (./config.js):  local mongoDB or [mongolab](https://mongolab.com/)
 - $ npm install
 - $ grunt  (to run)
 
